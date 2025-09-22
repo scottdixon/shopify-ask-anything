@@ -29,13 +29,6 @@
       endif
     -%}
 
-    <script>
-      console.log('Ask Anything Metafield Debug:', {
-        metafield_key: {{ metafield_key | json }},
-        final_questions: {{ questions | json }}
-      });
-    </script>
-
     {%- if questions.size > 0 -%}
       <div class="shop-ai-suggested-questions">
         {%- for question in questions -%}
@@ -60,7 +53,8 @@
 <script>
   window.shopChatConfig = {
     promptType: {{ block.settings.system_prompt | json }},
-    productDescription: {{ product.description | json }}
+    productDescription: {{ product.description | json }},
+    productTitle: {{ product.title | json }}
   };
   window.shopId = {{ shop.id }};
 </script>

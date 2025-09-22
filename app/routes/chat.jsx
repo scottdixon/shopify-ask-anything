@@ -67,6 +67,7 @@ async function handleChatRequest(request) {
     const body = await request.json();
     const userMessage = body.message;
     const productDescription = body.product_description;
+    const productTitle = body.product_title;
 
     // Validate required message
     if (!userMessage) {
@@ -88,6 +89,7 @@ async function handleChatRequest(request) {
         conversationId,
         promptType,
         productDescription,
+        productTitle,
         stream,
       });
     });
@@ -122,6 +124,7 @@ async function handleChatSession({
   conversationId,
   promptType,
   productDescription,
+  productTitle,
   stream,
 }) {
   // Initialize services
@@ -169,7 +172,12 @@ async function handleChatSession({
     let conversationHistory = [];
     let systemMessage = null;
     if (productDescription) {
-      systemMessage = `The user is viewing a product with the following description: ${productDescription}`;
+      let productContext = `The user is viewing a product`;
+      if (productTitle) {
+        productContext += ` called "${productTitle}"`;
+      }
+      productContext += ` with the following description: ${productDescription}`;
+      systemMessage = productContext;
     }
     conversationHistory.push({
       role: "user",

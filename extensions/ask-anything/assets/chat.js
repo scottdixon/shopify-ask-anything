@@ -453,11 +453,13 @@
         try {
           const promptType = window.shopChatConfig?.promptType || "standardAssistant";
           const productDescription = window.shopChatConfig?.productDescription || null;
+          const productTitle = window.shopChatConfig?.productTitle || null;
           const requestBody = JSON.stringify({
             message: userMessage,
             conversation_id: conversationId,
             prompt_type: promptType,
-            product_description: productDescription
+            product_description: productDescription,
+            product_title: productTitle
           });
 
           const streamUrl = 'https://localhost:3458/chat';
