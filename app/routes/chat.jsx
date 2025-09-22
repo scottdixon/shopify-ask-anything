@@ -66,6 +66,7 @@ async function handleChatRequest(request) {
     // Get message data from request body
     const body = await request.json();
     const userMessage = body.message;
+    const productDescription = body.product_description;
 
     // Validate required message
     if (!userMessage) {
@@ -86,6 +87,7 @@ async function handleChatRequest(request) {
         userMessage,
         conversationId,
         promptType,
+        productDescription,
         stream,
       });
     });
@@ -119,6 +121,7 @@ async function handleChatSession({
   userMessage,
   conversationId,
   promptType,
+  productDescription,
   stream,
 }) {
   // Initialize services
@@ -163,12 +166,15 @@ async function handleChatSession({
     }
 
     // Prepare conversation state
-    let conversationHistory = [
-      {
-        role: "user",
-        content: userMessage,
-      },
-    ];
+    let conversationHistory = [];
+    let systemMessage = null;
+    if (productDescription) {
+      systemMessage = `The user is viewing a product with the following description: ${productDescription}`;
+    }
+    conversationHistory.push({
+      role: "user",
+      content: userMessage,
+    });
     let productsToDisplay = [];
 
     // Execute the conversation stream
@@ -180,6 +186,7 @@ async function handleChatSession({
           messages: conversationHistory,
           promptType,
           tools: mcpClient.tools,
+          systemMessage,
         },
         {
           // Handle text chunks

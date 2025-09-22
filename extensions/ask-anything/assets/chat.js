@@ -452,10 +452,12 @@
 
         try {
           const promptType = window.shopChatConfig?.promptType || "standardAssistant";
+          const productDescription = window.shopChatConfig?.productDescription || null;
           const requestBody = JSON.stringify({
             message: userMessage,
             conversation_id: conversationId,
-            prompt_type: promptType
+            prompt_type: promptType,
+            product_description: productDescription
           });
 
           const streamUrl = 'https://localhost:3458/chat';
@@ -809,10 +811,6 @@
       if (!container) return;
 
       this.UI.init(container);
-
-      // No previous conversation, show welcome message
-      const welcomeMessage = window.shopChatConfig?.welcomeMessage || "👋 Hi there! How can I help you today?";
-      this.Message.add(welcomeMessage, 'assistant', this.UI.elements.messagesContainer);
     }
   };
 

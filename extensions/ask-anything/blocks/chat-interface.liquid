@@ -60,7 +60,7 @@
 <script>
   window.shopChatConfig = {
     promptType: {{ block.settings.system_prompt | json }},
-    welcomeMessage: {{ block.settings.welcome_message | json }}
+    productDescription: {{ product.description | json }}
   };
   window.shopId = {{ shop.id }};
 </script>
@@ -70,12 +70,6 @@
   "name": "AI Ask Anything",
   "target": "section",
   "settings": [
-    {
-      "type": "text",
-      "id": "welcome_message",
-      "label": "Welcome Message",
-      "default": "👋 Hi there! How can I help you today?"
-    },
     {
       "type": "header",
       "content": "Suggested Questions"

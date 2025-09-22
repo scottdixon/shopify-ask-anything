@@ -21,6 +21,7 @@ export function createClaudeService(apiKey = process.env.CLAUDE_API_KEY) {
    * @param {Array} params.messages - Conversation history
    * @param {string} params.promptType - The type of system prompt to use
    * @param {Array} params.tools - Available tools for Claude
+   * @param {string} [params.systemMessage] - An optional, additional system message
    * @param {Object} streamHandlers - Stream event handlers
    * @param {Function} streamHandlers.onText - Handles text chunks
    * @param {Function} streamHandlers.onMessage - Handles complete messages
@@ -30,10 +31,16 @@ export function createClaudeService(apiKey = process.env.CLAUDE_API_KEY) {
   const streamConversation = async ({
     messages,
     promptType = AppConfig.api.defaultPromptType,
-    tools
+    tools,
+    systemMessage
   }, streamHandlers) => {
     // Get system prompt from configuration or use default
-    const systemInstruction = getSystemPrompt(promptType);
+    let systemInstruction = getSystemPrompt(promptType);
+
+    // Append the product description if it exists
+    if (systemMessage) {
+      systemInstruction += `\n\n${systemMessage}`;
+    }
 
     // Create stream
     const stream = await anthropic.messages.stream({
