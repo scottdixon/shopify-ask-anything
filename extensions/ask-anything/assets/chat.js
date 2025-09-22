@@ -567,84 +567,6 @@
             ShopAIChat.UI.showTypingIndicator();
             break;
         }
-      },
-
-      /**
-       * Fetch chat history from the server
-       * @param {string} conversationId - Conversation ID
-       * @param {HTMLElement} messagesContainer - The messages container
-       */
-      fetchChatHistory: async function(conversationId, messagesContainer) {
-        try {
-          // Show a loading message
-          const loadingMessage = document.createElement('div');
-          loadingMessage.classList.add('shop-ai-message', 'assistant');
-          loadingMessage.textContent = "Loading conversation history...";
-          messagesContainer.appendChild(loadingMessage);
-
-          // Fetch history from the server
-          const historyUrl = `https://localhost:3458/chat?history=true&conversation_id=${encodeURIComponent(conversationId)}`;
-          console.log('Fetching history from:', historyUrl);
-
-          const response = await fetch(historyUrl, {
-            method: 'GET',
-            headers: {
-              'Accept': 'application/json',
-              'Content-Type': 'application/json'
-            },
-            mode: 'cors'
-          });
-
-          if (!response.ok) {
-            console.error('History fetch failed:', response.status, response.statusText);
-            throw new Error('Failed to fetch chat history: ' + response.status);
-          }
-
-          const data = await response.json();
-
-          // Remove loading message
-          messagesContainer.removeChild(loadingMessage);
-
-          // No messages, show welcome message
-          if (!data.messages || data.messages.length === 0) {
-            const welcomeMessage = window.shopChatConfig?.welcomeMessage || "👋 Hi there! How can I help you today?";
-            ShopAIChat.Message.add(welcomeMessage, 'assistant', messagesContainer);
-            return;
-          }
-
-          // Add messages to the UI - filter out tool results
-          data.messages.forEach(message => {
-            try {
-              const messageContents = JSON.parse(message.content);
-              for (const contentBlock of messageContents) {
-                if (contentBlock.type === 'text') {
-                  ShopAIChat.Message.add(contentBlock.text, message.role, messagesContainer);
-                }
-              }
-            } catch (e) {
-              ShopAIChat.Message.add(message.content, message.role, messagesContainer);
-            }
-          });
-
-          // Scroll to bottom
-          ShopAIChat.UI.scrollToBottom();
-
-        } catch (error) {
-          console.error('Error fetching chat history:', error);
-
-          // Remove loading message if it exists
-          const loadingMessage = messagesContainer.querySelector('.shop-ai-message.assistant');
-          if (loadingMessage && loadingMessage.textContent === "Loading conversation history...") {
-            messagesContainer.removeChild(loadingMessage);
-          }
-
-          // Show error and welcome message
-          const welcomeMessage = window.shopChatConfig?.welcomeMessage || "👋 Hi there! How can I help you today?";
-          ShopAIChat.Message.add(welcomeMessage, 'assistant', messagesContainer);
-
-          // Clear the conversation ID since we couldn't fetch this conversation
-          sessionStorage.removeItem('shopAiConversationId');
-        }
       }
     },
 
@@ -864,17 +786,9 @@
 
       this.UI.init(container);
 
-      // Check for existing conversation
-      const conversationId = sessionStorage.getItem('shopAiConversationId');
-
-      if (conversationId) {
-        // Fetch conversation history
-        this.API.fetchChatHistory(conversationId, this.UI.elements.messagesContainer);
-      } else {
-        // No previous conversation, show welcome message
-        const welcomeMessage = window.shopChatConfig?.welcomeMessage || "👋 Hi there! How can I help you today?";
-        this.Message.add(welcomeMessage, 'assistant', this.UI.elements.messagesContainer);
-      }
+      // No previous conversation, show welcome message
+      const welcomeMessage = window.shopChatConfig?.welcomeMessage || "👋 Hi there! How can I help you today?";
+      this.Message.add(welcomeMessage, 'assistant', this.UI.elements.messagesContainer);
     }
   };
 

@@ -2,7 +2,6 @@
  * Tool Service
  * Manages tool execution and processing
  */
-import { saveMessage } from "../db.server";
 import AppConfig from "./config.server";
 
 /**
@@ -129,15 +128,6 @@ export function createToolService() {
 
     // Add to in-memory history
     conversationHistory.push(toolResultMessage);
-
-    // Save to database with special format to indicate tool result
-    if (conversationId) {
-      try {
-        await saveMessage(conversationId, 'user', JSON.stringify(toolResultMessage.content));
-      } catch (error) {
-        console.error('Error saving tool result to database:', error);
-      }
-    }
   };
 
   return {
