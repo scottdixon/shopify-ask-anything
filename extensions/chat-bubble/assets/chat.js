@@ -28,9 +28,7 @@
         // Cache DOM elements
         this.elements = {
           container: container,
-          chatBubble: container.querySelector('.shop-ai-chat-bubble'),
           chatWindow: container.querySelector('.shop-ai-chat-window'),
-          closeButton: container.querySelector('.shop-ai-chat-close'),
           chatInput: container.querySelector('.shop-ai-chat-input input'),
           sendButton: container.querySelector('.shop-ai-chat-send'),
           messagesContainer: container.querySelector('.shop-ai-chat-messages')
@@ -52,13 +50,7 @@
        * Set up all event listeners for UI interactions
        */
       setupEventListeners: function() {
-        const { chatBubble, closeButton, chatInput, sendButton, messagesContainer } = this.elements;
-
-        // Toggle chat window visibility
-        chatBubble.addEventListener('click', () => this.toggleChatWindow());
-
-        // Close chat window
-        closeButton.addEventListener('click', () => this.closeChatWindow());
+        const { chatInput, sendButton, messagesContainer } = this.elements;
 
         // Send message when pressing Enter in input
         chatInput.addEventListener('keypress', (e) => {
@@ -108,45 +100,6 @@
         };
         window.addEventListener('resize', setViewportHeight);
         setViewportHeight();
-      },
-
-      /**
-       * Toggle chat window visibility
-       */
-      toggleChatWindow: function() {
-        const { chatWindow, chatInput } = this.elements;
-
-        chatWindow.classList.toggle('active');
-
-        if (chatWindow.classList.contains('active')) {
-          // On mobile, prevent body scrolling and delay focus
-          if (this.isMobile) {
-            document.body.classList.add('shop-ai-chat-open');
-            setTimeout(() => chatInput.focus(), 500);
-          } else {
-            chatInput.focus();
-          }
-          // Always scroll messages to bottom when opening
-          this.scrollToBottom();
-        } else {
-          // Remove body class when closing
-          document.body.classList.remove('shop-ai-chat-open');
-        }
-      },
-
-      /**
-       * Close chat window
-       */
-      closeChatWindow: function() {
-        const { chatWindow, chatInput } = this.elements;
-
-        chatWindow.classList.remove('active');
-
-        // On mobile, blur input to hide keyboard and enable body scrolling
-        if (this.isMobile) {
-          chatInput.blur();
-          document.body.classList.remove('shop-ai-chat-open');
-        }
       },
 
       /**

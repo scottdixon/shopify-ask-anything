@@ -1,7 +1,7 @@
 {
   "chat": {
-    "title": "Store Assistant",
-    "inputPlaceholder": "Type your message here...",
+    "title": "✨ Ask AI about this product",
+    "inputPlaceholder": "Type your question here...",
     "sendButton": "Send",
     "closeButton": "Close"
   }
