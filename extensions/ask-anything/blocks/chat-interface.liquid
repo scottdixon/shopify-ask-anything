@@ -27,6 +27,27 @@
       if questions.size == 0
         assign questions = block.settings.default_questions | newline_to_br | split: '<br />' | compact
       endif
+
+      assign additional_info = ''
+      assign info_metafield_keys = block.settings.info_metafields | split: ','
+      if product and info_metafield_keys.size > 0
+        for item in info_metafield_keys
+          assign pair = item | split: ':'
+          assign label = pair[0] | strip
+          assign metafield_full_key = pair[1] | strip
+
+          if label != blank and metafield_full_key != blank
+            assign metafield_parts = metafield_full_key | split: '.'
+            assign namespace = metafield_parts[0]
+            assign metafield_key = metafield_parts[1]
+            assign metafield_value = product.metafields[namespace][metafield_key].value
+
+            if metafield_value
+              assign additional_info = additional_info | append: '\n' | append: label | append: ': ' | append: metafield_value
+            endif
+          endif
+        endfor
+      endif
     -%}
 
     {%- if questions.size > 0 -%}
@@ -54,7 +75,8 @@
   window.shopChatConfig = {
     promptType: {{ block.settings.system_prompt | json }},
     productDescription: {{ product.description | json }},
-    productTitle: {{ product.title | json }}
+    productTitle: {{ product.title | json }},
+    additionalInfo: {{ additional_info | json }}
   };
   window.shopId = {{ shop.id }};
 </script>
@@ -80,6 +102,16 @@
       "id": "questions_metafield",
       "label": "Product Questions Metafield",
       "info": "Enter a product metafield key (e.g., custom.questions) to use for suggestions on product pages. This should be a list of single-line text fields."
+    },
+    {
+      "type": "header",
+      "content": "Product Context"
+    },
+    {
+      "type": "text",
+      "id": "info_metafields",
+      "label": "Additional Information Metafields",
+      "info": "Enter a comma-separated list of label and product metafield key pairs (e.g., Specs:custom.specs, Materials:custom.materials) to provide additional context to the AI."
     },
     {
       "type": "select",
