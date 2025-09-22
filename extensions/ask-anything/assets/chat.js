@@ -31,7 +31,8 @@
           chatWindow: container.querySelector('.shop-ai-chat-window'),
           chatInput: container.querySelector('.shop-ai-chat-input input'),
           sendButton: container.querySelector('.shop-ai-chat-send'),
-          messagesContainer: container.querySelector('.shop-ai-chat-messages')
+          messagesContainer: container.querySelector('.shop-ai-chat-messages'),
+          suggestedQuestions: container.querySelector('.shop-ai-suggested-questions')
         };
 
         // Detect mobile device
@@ -44,17 +45,27 @@
         if (this.isMobile) {
           this.setupMobileViewport();
         }
+
+        // Initially collapse the chat window
+        this.elements.chatWindow.classList.add('collapsed');
       },
 
       /**
        * Set up all event listeners for UI interactions
        */
       setupEventListeners: function() {
-        const { chatInput, sendButton, messagesContainer } = this.elements;
+        const { chatInput, sendButton, messagesContainer, chatWindow, suggestedQuestions } = this.elements;
+
+        const expandChat = () => {
+          if (chatWindow.classList.contains('collapsed')) {
+            chatWindow.classList.remove('collapsed');
+          }
+        };
 
         // Send message when pressing Enter in input
         chatInput.addEventListener('keypress', (e) => {
           if (e.key === 'Enter' && chatInput.value.trim() !== '') {
+            expandChat();
             ShopAIChat.Message.send(chatInput, messagesContainer);
 
             // On mobile, handle keyboard
@@ -68,6 +79,7 @@
         // Send message when clicking send button
         sendButton.addEventListener('click', () => {
           if (chatInput.value.trim() !== '') {
+            expandChat();
             ShopAIChat.Message.send(chatInput, messagesContainer);
 
             // On mobile, focus input after sending
@@ -76,6 +88,18 @@
             }
           }
         });
+
+        // Handle suggested questions
+        if (suggestedQuestions) {
+          suggestedQuestions.addEventListener('click', (e) => {
+            if (e.target.classList.contains('shop-ai-suggestion-pill')) {
+              const messageText = e.target.textContent;
+              chatInput.value = messageText;
+              expandChat();
+              ShopAIChat.Message.send(chatInput, messagesContainer);
+            }
+          });
+        }
 
         // Handle window resize to adjust scrolling
         window.addEventListener('resize', () => this.scrollToBottom());

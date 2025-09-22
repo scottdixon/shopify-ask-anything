@@ -9,6 +9,41 @@
       <!-- Messages will be added here by JavaScript -->
     </div>
 
+    {%- liquid
+      assign questions = '' | split: ''
+      assign metafield_key = block.settings.questions_metafield
+
+      if product and metafield_key != blank
+        assign metafield_parts = metafield_key | split: '.'
+        assign namespace = metafield_parts[0]
+        assign key = metafield_parts[1]
+        assign metafield_value = product.metafields[namespace][key].value
+
+        if metafield_value and metafield_value.size > 0
+          assign questions = metafield_value
+        endif
+      endif
+
+      if questions.size == 0
+        assign questions = block.settings.default_questions | newline_to_br | split: '<br />' | compact
+      endif
+    -%}
+
+    <script>
+      console.log('Ask Anything Metafield Debug:', {
+        metafield_key: {{ metafield_key | json }},
+        final_questions: {{ questions | json }}
+      });
+    </script>
+
+    {%- if questions.size > 0 -%}
+      <div class="shop-ai-suggested-questions">
+        {%- for question in questions -%}
+          <div class="shop-ai-suggestion-pill">{{ question }}</div>
+        {%- endfor -%}
+      </div>
+    {%- endif -%}
+
     <div class="shop-ai-chat-input">
       <input type="text" placeholder="{{ 'chat.inputPlaceholder' | t }}">
       <button class="shop-ai-chat-send">
@@ -40,6 +75,23 @@
       "id": "welcome_message",
       "label": "Welcome Message",
       "default": "👋 Hi there! How can I help you today?"
+    },
+    {
+      "type": "header",
+      "content": "Suggested Questions"
+    },
+    {
+      "type": "textarea",
+      "id": "default_questions",
+      "label": "Default Questions",
+      "info": "Enter one question per line.",
+      "default": "What are your best-selling products?\nDo you have any products on sale?\nWhat is your return policy?"
+    },
+    {
+      "type": "text",
+      "id": "questions_metafield",
+      "label": "Product Questions Metafield",
+      "info": "Enter a product metafield key (e.g., custom.questions) to use for suggestions on product pages. This should be a list of single-line text fields."
     },
     {
       "type": "select",
